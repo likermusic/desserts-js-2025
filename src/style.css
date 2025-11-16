@@ -33,6 +33,7 @@ main {
   flex-wrap: wrap;
   gap: 20px;
   flex: 3;
+  justify-content: center;
 }
 
 .product {
@@ -77,6 +78,11 @@ main {
   cursor: pointer;
   border-radius: 60px;
   margin-top: auto;
+}
+.product button:disabled {
+  cursor: default;
+  /* background-color: #501e1953; */
+  opacity: 0.6;
 }
 .product button img {
   margin-top: 5px;

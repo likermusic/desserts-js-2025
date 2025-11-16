@@ -1,5 +1,10 @@
 export function printError(error) {
-  return `<div class="error-message">
-    ${error}
+  const errorMarkup = `<div class="error-message">
+    ${error.message}
   </div>`;
+
+  document.body.insertAdjacentHTML("beforeend", errorMarkup);
+  setTimeout(() => {
+    document.querySelector(".error-message").remove();
+  }, 3000);
 }

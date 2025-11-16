@@ -1,10 +1,13 @@
 import { getProducts } from "./api";
 import { printError } from "./error";
-
+import { spinner } from "./spinner";
 // Добавить Loader
 
 async function getProductsWrapper() {
   try {
+    spinner(".product-list", "afterbegin");
+    // throw new Error("Не удолось получить товары");
+
     const products = await getProducts();
     if (products.length > 0) {
       renderProducts(products);
@@ -12,10 +15,9 @@ async function getProductsWrapper() {
       throw new Error("Не удолось получить товары");
     }
   } catch (error) {
-    document.body.insertAdjacentHTML("beforeend", printError(error.message));
-    setTimeout(() => {
-      document.querySelector(".error-message").remove();
-    }, 3000);
+    printError(error);
+  } finally {
+    document.querySelector("#spinner").remove();
   }
 }
 
@@ -23,12 +25,14 @@ function renderProducts(products) {
   const productsMarkup = products.map(
     (product) =>
       `
-    <div class="product">
+    <div class="product" data-id="${product.id}">
       <img src="${product.image.desktop}" alt="${product.name}">
       <h2>${product.name}</h2>
       <p>$${product.price}</p>
-      <button data-id="${product.id}"> <img src="/assets/icons/icon-add-to-cart.svg" class="add-to-cart">
-        <span>Add to Cart</span></button>
+      <button class="add-to-cart"> 
+        <img src="/assets/icons/icon-add-to-cart.svg">
+        <span>Add to Cart</span>
+      </button>
     </div>
     `
   );
