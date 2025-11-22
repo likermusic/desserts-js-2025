@@ -1,10 +1,5 @@
-//  <li class="cart-item">
-//       <span>${item.name}</span>
-//       <span>${total product price}</span>
-//       <img class="remove-item" src="assets/icons/icon-remove-item.svg" alt="">
-//     </li>
-
-import { getProductById } from "./api";
+import { addProductToCart, getProductById } from "./api";
+import { printError } from "./error";
 import { spinner } from "./spinner";
 
 document.querySelector(".product-list").addEventListener("click", async (e) => {
@@ -13,8 +8,20 @@ document.querySelector(".product-list").addEventListener("click", async (e) => {
     const btn = e.target.closest(".add-to-cart");
     try {
       btn.disabled = true;
-      spinner(".add-to-cart", "afterbegin");
-      const product = await getProductById(id);
+      spinner(`.product[data-id="${id}"] .add-to-cart`, "afterbegin", 20);
+      const product = await addProductToCart(id);
+      const productMarkup = `
+       <li class="cart-item" data-id="${product.id}">
+        <span>${product.name}</span>
+        <span>x1</span>
+        <span>$${product.price}</span>
+        <img class="remove-item" src="assets/icons/icon-remove-item.svg" alt="">
+      </li>
+      `;
+
+      document
+        .querySelector(".cart-items")
+        .insertAdjacentHTML("beforeend", productMarkup);
     } catch (error) {
       printError(error);
     } finally {
