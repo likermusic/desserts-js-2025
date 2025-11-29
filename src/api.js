@@ -58,11 +58,11 @@ async function updateCartProductCount(id, count) {
   const resp = await fetch(`${apiUrl}/cart/${id}`, {
     method: "PATCH",
     "Content-Type": "application/json",
-    body: JSON.stringify({ count: count + 1 }),
+    body: JSON.stringify({ count }),
   });
 
   if (!resp.ok) {
-    throw new Error("Ошибка добавления товара");
+    throw new Error("Ошибка выполнения операции");
   }
 }
 
@@ -82,7 +82,22 @@ export async function addProductToCart(id) {
     return { ...data, count: 1 };
   } else {
     const count = productInCart.count;
-    await updateCartProductCount(id, count);
+    await updateCartProductCount(id, count + 1);
     return { ...data, count: count + 1 };
+  }
+}
+
+export async function removeProductFromCart(id) {
+  const product = await getProductFromCartById(id);
+  if (product.count === 1) {
+    const resp = await fetch(`${apiUrl}/cart/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!resp.ok) {
+      throw new Error("Ошибка удаления товара");
+    }
+  } else if (product.count > 1) {
+    await updateCartProductCount(id, product.count - 1);
   }
 }

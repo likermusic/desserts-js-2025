@@ -1,4 +1,4 @@
-import { addProductToCart, getProductById } from "./api";
+import { addProductToCart, getProductById, removeProductFromCart } from "./api";
 import { printError } from "./error";
 import { spinner } from "./spinner";
 
@@ -53,3 +53,12 @@ document.querySelector(".product-list").addEventListener("click", async (e) => {
     }
   }
 });
+
+document.querySelector(".cart-items").addEventListener("click", async (e) => {
+  if (e.target.matches(".remove-item")) {
+    const id = e.target.closest(".cart-item").dataset.id;
+    await removeProductFromCart(id);
+  }
+});
+
+// document.addEventListener("DOMContentLoaded", () => {});
