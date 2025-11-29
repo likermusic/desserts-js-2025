@@ -79,7 +79,8 @@ main {
   border-radius: 60px;
   margin-top: auto;
 }
-.product button:disabled {
+.product button:disabled,
+.confirm-order:disabled {
   cursor: default;
   /* background-color: #501e1953; */
   opacity: 0.6;

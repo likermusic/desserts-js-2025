@@ -79,10 +79,10 @@ export async function addProductToCart(id) {
 
   if (!productInCart) {
     await addProductToCartFirst(id);
-    return data;
+    return { ...data, count: 1 };
   } else {
     const count = productInCart.count;
     await updateCartProductCount(id, count);
-    return data;
+    return { ...data, count: count + 1 };
   }
 }
