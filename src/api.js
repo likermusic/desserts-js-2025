@@ -1,13 +1,13 @@
 const apiUrl = "http://localhost:3000";
 
-export async function getProducts() {
+export async function getProducts(uri = "products") {
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve();
     }, 500);
   });
 
-  const resp = await fetch(`${apiUrl}/products`);
+  const resp = await fetch(`${apiUrl}/${uri}`);
   if (!resp.ok) {
     throw new Error("Ошибка получения товаров");
   }

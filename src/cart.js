@@ -1,4 +1,9 @@
-import { addProductToCart, getProductById, removeProductFromCart } from "./api";
+import {
+  addProductToCart,
+  getProductById,
+  getProducts,
+  removeProductFromCart,
+} from "./api";
 import { printError } from "./error";
 import { spinner } from "./spinner";
 
@@ -83,4 +88,29 @@ document.querySelector(".cart-items").addEventListener("click", async (e) => {
   }
 });
 
-// document.addEventListener("DOMContentLoaded", () => {});
+async function loadProductsFromCart() {
+  const cartProducts = await getProducts("cart"); //[{id, count},]
+
+  // const r = await Promise.all(cartProducts.map((el) => getProductById(el.id)));
+
+  //const products = []; // [{id, name, cat, pr,im}]
+  for (let i = 0; i < cartProducts.length; i++) {
+    const product = await getProductById(cartProducts[i].id);
+    throw new Error();
+    cartProducts[i].name = product.name;
+    cartProducts[i].price = product.price;
+  }
+
+  return cartProducts;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const cartProducts = await loadProductsFromCart();
+    //отрисовать товары
+    //пересчитать count, price
+    //оформить заказ
+  } catch (error) {
+    printError({ message: "Ошибка получения товаров из корзины" });
+  }
+});
