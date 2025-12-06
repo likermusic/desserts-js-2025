@@ -19,7 +19,7 @@ export async function getProductById(id) {
   // await new Promise((resolve) => {
   //   setTimeout(() => {
   //     resolve();
-  //   }, 500);
+  //   }, 2000);
   // });
   const resp = await fetch(`${apiUrl}/products/${id}`);
   if (!resp.ok) {
@@ -30,6 +30,11 @@ export async function getProductById(id) {
 }
 
 export async function getProductFromCartById(id) {
+  // await new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve();
+  //   }, 1000);
+  // });
   const resp = await fetch(`${apiUrl}/cart/${id}`);
   // 200 - {id:1,count:2}
   // 404
@@ -88,7 +93,14 @@ export async function addProductToCart(id) {
 }
 
 export async function removeProductFromCart(id) {
-  const product = await getProductFromCartById(id);
+  // const product = await getProductFromCartById(id);
+  // const { price } = await getProductById(id);
+
+  const [product, { price }] = await Promise.all([
+    getProductFromCartById(id),
+    getProductById(id),
+  ]).then((data) => data);
+
   if (product.count === 1) {
     const resp = await fetch(`${apiUrl}/cart/${id}`, {
       method: "DELETE",
@@ -100,4 +112,9 @@ export async function removeProductFromCart(id) {
   } else if (product.count > 1) {
     await updateCartProductCount(id, product.count - 1);
   }
+
+  return {
+    count: product.count - 1,
+    price,
+  };
 }

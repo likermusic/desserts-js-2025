@@ -5,13 +5,21 @@ import { spinner } from "./spinner";
 let cartCount = 0;
 let orderTotal = 0;
 
-function calcCartCount() {
-  cartCount++;
+function calcCartCount(isAdd = true) {
+  if (isAdd) {
+    cartCount++;
+  } else {
+    cartCount--;
+  }
   document.querySelector(".cart-count").textContent = cartCount;
 }
 
-function calcOrderTotal(productPrice) {
-  orderTotal += productPrice;
+function calcOrderTotal(productPrice, isAdd = true) {
+  if (isAdd) {
+    orderTotal += productPrice;
+  } else {
+    orderTotal -= productPrice;
+  }
   document.querySelector(".total-price").textContent = orderTotal.toFixed(2);
 }
 
@@ -57,7 +65,21 @@ document.querySelector(".product-list").addEventListener("click", async (e) => {
 document.querySelector(".cart-items").addEventListener("click", async (e) => {
   if (e.target.matches(".remove-item")) {
     const id = e.target.closest(".cart-item").dataset.id;
-    await removeProductFromCart(id);
+    try {
+      const { count: productCount, price } = await removeProductFromCart(id);
+      if (productCount === 0) {
+        //remove
+        e.target.closest(".cart-item").remove();
+      } else {
+        //update
+        e.target.closest(".cart-item").querySelector(".count").textContent =
+          productCount;
+      }
+      calcCartCount(false);
+      calcOrderTotal(price, false);
+    } catch (error) {
+      printError(error);
+    }
   }
 });
 
