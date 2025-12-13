@@ -109,26 +109,48 @@
       "price": 6.5
     }
   ],
-  "cart": [
+  "cart": [],
+  "orders": [
+    {
+      "id": "1",
+      "count": 1,
+      "orderId": 1
+    },
     {
       "id": "2",
-      "count": 2
+      "count": 2,
+      "orderId": 1
     },
     {
-      "id": "5",
-      "count": 1
-    },
-    {
-      "id": "6",
-      "count": 1
-    },
-    {
-      "id": "4",
-      "count": 1
+      "id": "3",
+      "count": 1,
+      "orderId": 1
     },
     {
       "id": "1",
-      "count": 3
+      "count": 2,
+      "orderId": 2
+    },
+    {
+      "id": "2",
+      "count": 2,
+      "orderId": 2
+    },
+    {
+      "id": "3",
+      "count": 2,
+      "orderId": 2
+    },
+    {
+      "id": "4",
+      "count": 1,
+      "orderId": 2
+    }
+  ],
+  "orderId": [
+    {
+      "orderId": 2,
+      "id": "1"
     }
   ]
 }

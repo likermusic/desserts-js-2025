@@ -118,3 +118,54 @@ export async function removeProductFromCart(id) {
     price,
   };
 }
+
+export async function makeOrder() {
+  const cartResp = await fetch(`${apiUrl}/cart`);
+  if (!cartResp.ok) {
+    throw new Error("Ошибка оформления заказа");
+  }
+
+  const cart = await cartResp.json();
+
+  // Получаем текущий orderId
+  const getOrderIdResp = await fetch(`${apiUrl}/orderId`);
+  if (!getOrderIdResp.ok) {
+    throw new Error("Ошибка оформления заказа");
+  }
+
+  const orderIdArr = await getOrderIdResp.json();
+  const newOrderId = orderIdArr[0].orderId + 1;
+  console.log(newOrderId);
+
+  for (const product of cart) {
+    const ordersResp = await fetch(`${apiUrl}/orders`, {
+      method: "POST",
+      "Content-Type": "application/json",
+      body: JSON.stringify({ ...product, orderId: newOrderId }),
+    });
+
+    if (!ordersResp.ok) {
+      throw new Error("Ошибка оформления заказа2");
+    }
+  }
+
+  for (const product of cart) {
+    const deleteResp = await fetch(`${apiUrl}/cart/${product.id}`, {
+      method: "DELETE",
+    });
+    if (!deleteResp.ok) {
+      throw new Error("Ошибка оформления заказа");
+    }
+  }
+
+  //Обновление orderID
+  const orderUpdateResp = await fetch(`${apiUrl}/orderId/1`, {
+    method: "PUT",
+    "Content-Type": "application/json",
+    body: JSON.stringify({ orderId: newOrderId }),
+  });
+
+  if (!orderUpdateResp.ok) {
+    throw new Error("Ошибка оформления заказа");
+  }
+}

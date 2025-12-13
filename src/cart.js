@@ -2,6 +2,7 @@ import {
   addProductToCart,
   getProductById,
   getProducts,
+  makeOrder,
   removeProductFromCart,
 } from "./api";
 import { printError } from "./error";
@@ -25,6 +26,7 @@ function calcOrderTotal(productPrice, isAdd = true) {
   } else {
     orderTotal -= productPrice;
   }
+
   document.querySelector(".total-price").textContent = orderTotal.toFixed(2);
 }
 
@@ -81,6 +83,9 @@ document.querySelector(".cart-items").addEventListener("click", async (e) => {
           productCount;
       }
       calcCartCount(false);
+      if (cartCount === 0) {
+        document.querySelector(".confirm-order").disabled = true;
+      }
       calcOrderTotal(price, false);
     } catch (error) {
       printError(error);
@@ -96,7 +101,6 @@ async function loadProductsFromCart() {
   //const products = []; // [{id, name, cat, pr,im}]
   for (let i = 0; i < cartProducts.length; i++) {
     const product = await getProductById(cartProducts[i].id);
-    throw new Error();
     cartProducts[i].name = product.name;
     cartProducts[i].price = product.price;
   }
@@ -104,13 +108,72 @@ async function loadProductsFromCart() {
   return cartProducts;
 }
 
+function renderCartProducts(cartProducts) {
+  const markup = cartProducts.map(
+    (product) => `
+          <li class="cart-item" data-id="${product.id}">
+            <span>${product.name}</span>
+            <span>x<span class="count">${product.count}</span></span>
+            <span>$${product.price}</span>
+            <img class="remove-item" src="assets/icons/icon-remove-item.svg" alt="">
+          </li>
+          `
+  );
+
+  document
+    .querySelector(".cart-items")
+    .insertAdjacentHTML("beforeend", markup.join(""));
+}
+
+function renderTotals(cartProducts) {
+  const data = cartProducts.reduce(
+    (acc, product) => ({
+      totalCount: acc.totalCount + product.count,
+      totalPrice: acc.totalPrice + product.count * product.price,
+    }),
+    { totalCount: 0, totalPrice: 0 }
+  );
+
+  cartCount = data.totalCount;
+  orderTotal = Number(data.totalPrice.toFixed(2));
+
+  document.querySelector(".cart-count").textContent = cartCount;
+  document.querySelector(".total-price").textContent = orderTotal;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const cartProducts = await loadProductsFromCart();
     //отрисовать товары
+    renderCartProducts(cartProducts);
     //пересчитать count, price
+    renderTotals(cartProducts);
+    //раздизейбл кнопки
+    if (cartCount > 0) {
+      document.querySelector(".confirm-order").disabled = false;
+    }
     //оформить заказ
   } catch (error) {
     printError({ message: "Ошибка получения товаров из корзины" });
+  }
+});
+
+document.querySelector(".confirm-order").addEventListener("click", async () => {
+  try {
+    const cartProducts = await loadProductsFromCart();
+    const output = cartProducts.map(
+      (product, ind) =>
+        `${ind + 1}. ${product.name} х${product.count} | $${product.price}\n`
+    );
+    const msg = `Ваш заказ:\n\n${output.join("")}\n\nПодтвердите ваш заказ`;
+    if (!confirm(msg)) {
+      return;
+    } else {
+      await makeOrder();
+      alert("Ваш заказ уже в пути ✅");
+      location.reload();
+    }
+  } catch (error) {
+    printError(error);
   }
 });
